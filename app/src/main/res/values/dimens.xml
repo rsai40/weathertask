@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="s10dp">10dp</dimen>
+    <dimen name="s14sp">14sp</dimen>
+    <dimen name="s12sp">12sp</dimen>
+</resources>

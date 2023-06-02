@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">WeatherTask</string>
+    <string name="city_name">Enter City name</string>
+    <string name="get">Go</string>
+    <string name="city">City</string>
+    <string name="temp">Temperature</string>
+    <string name="pressure">Pressure</string>
+    <string name="humidity">Humidity</string>
+    <string name="loading">Loading</string>
+</resources>
