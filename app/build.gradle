@@ -36,6 +36,10 @@ android {
         dataBinding true
         viewBinding true
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.6"
+    }
 }
 
 dependencies {
@@ -74,4 +78,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1' //viewModel scope
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'  //livedata
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
+
+    //implementation("androidx.compose.ui:ui")
 }

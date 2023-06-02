@@ -18,4 +18,5 @@ class WeatherViewmodel : ViewModel() {
     var pressure = MutableLiveData<String>()
     var humidity = MutableLiveData<String>()
 
+
 }

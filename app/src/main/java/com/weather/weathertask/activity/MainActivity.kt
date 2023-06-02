@@ -18,9 +18,11 @@ import com.weather.weathertask.R
 import com.weather.weathertask.databinding.ActivityMainBinding
 import com.weather.weathertask.model.WeatherModel
 import com.weather.weathertask.network.ApiService
+import com.weather.weathertask.utils.StringUtils
 import com.weather.weathertask.viewmodel.WeatherViewmodel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.util.*
@@ -168,8 +170,8 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         weatherViewmodel = ViewModelProvider(this)[WeatherViewmodel::class.java]
         var list = weatherViewmodel.observeWeatherLiveData()
-        mainBinding.weatherViewModel= weatherViewmodel
-        mainBinding.lifecycleOwner= this@MainActivity
+        mainBinding.weatherViewModel = weatherViewmodel
+        mainBinding.lifecycleOwner = this@MainActivity
 
         mainBinding.goWeatherBtn.setOnClickListener {
             if (city.equals("")) {
@@ -310,8 +312,10 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private fun updateData(response: Response<WeatherModel>) {
 
         CoroutineScope(Dispatchers.Main).launch {
-            weatherViewmodel.temp.value = response.body()!!.temp!!.temp.toString()
-           // mainBinding.temp.text = response.body()!!.temp!!.temp.toString()
+
+            weatherViewmodel.temp.value =
+                /*StringUtils.convertTemp*/(response.body()!!.temp!!.temp.toString())
+            // mainBinding.temp.text = response.body()!!.temp!!.temp.toString()
             weatherViewmodel.pressure.value = response.body()!!.temp!!.pressure.toString()
             weatherViewmodel.humidity.value = response.body()!!.temp!!.humidity.toString()
             weatherViewmodel.placeName.value = response.body()!!.name.toString()

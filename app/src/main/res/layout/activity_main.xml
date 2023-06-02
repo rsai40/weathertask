@@ -9,6 +9,8 @@
         <variable
             name="weatherViewModel"
             type="com.weather.weathertask.viewmodel.WeatherViewmodel" />
+
+        <import type="com.weather.weathertask.utils.StringUtils" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -122,7 +124,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/s10dp"
-            android:text="@{weatherViewModel.temp }"
+            android:text="@{weatherViewModel.temp}"
             android:textColor="@color/black"
             android:textSize="@dimen/s12sp"
             app:layout_constraintEnd_toEndOf="parent"
