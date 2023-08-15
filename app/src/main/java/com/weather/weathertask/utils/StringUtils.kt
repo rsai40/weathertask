@@ -1,13 +1,18 @@
 package com.weather.weathertask.utils
 
+import java.math.RoundingMode
+import java.text.DecimalFormat
+
 class StringUtils {
 
 
     companion object {
         fun convertTemp(temp: String): String {
-            val intTemp: Int = temp.toInt()
+            val intTemp: Float = temp.toFloat()
             var tempConv = ((intTemp - 273.1) * (9 / 5)) + 32
-            return "$tempConv F"
+            val df = DecimalFormat("#.##")
+            df.roundingMode = RoundingMode.CEILING
+            return "${df.format(tempConv).toFloat()} F"
         }
     }
 }

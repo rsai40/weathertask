@@ -16,6 +16,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/grey"
         tools:context=".activity.MainActivity">
 
         <EditText
@@ -26,10 +27,12 @@
             android:layout_marginTop="@dimen/s10dp"
             android:layout_marginRight="@dimen/s10dp"
             android:background="@drawable/edit_text_bg"
+            android:fontFamily="@font/alata"
             android:hint="@string/city_name"
+            android:maxLines="1"
             android:padding="@dimen/s10dp"
             android:textColor="@color/black"
-            android:textSize="@dimen/s14sp"
+            android:textSize="@dimen/s16sp"
             app:layout_constraintEnd_toStartOf="@id/guideline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -47,9 +50,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/s10dp"
+            android:layout_marginRight="@dimen/s10dp"
             android:background="@drawable/button_bg"
             android:gravity="center_horizontal"
             android:padding="@dimen/s10dp"
+            android:onClick="goButtonClick"
             android:text="@string/get"
             android:textAllCaps="true"
             android:textColor="@color/white"
@@ -68,128 +73,158 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/city_search">
 
-            <LinearLayout
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/city_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/place_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/s10dp"
+                        android:layout_weight="0.4"
+                        android:padding="@dimen/s10dp"
+                        android:text="@string/city"
+                        android:textColor="@color/standard"
+                        android:textSize="@dimen/s14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/city_search" />
+
+                    <TextView
+                        android:id="@+id/place_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/s10dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/alata"
+                        android:padding="@dimen/s10dp"
+                        android:text="@{weatherViewModel.placeName}"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/s14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/city_search" />
+
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/place_text"
+                    android:id="@+id/temp_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/s10dp"
-                    android:layout_weight="0.4"
-                    android:padding="@dimen/s10dp"
-                    android:text="@string/city"
+                    android:text="@string/temp"
                     android:textColor="@color/standard"
                     android:textSize="@dimen/s14sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/city_search" />
+                    app:layout_constraintTop_toBottomOf="@id/city_layout" />
 
                 <TextView
-                    android:id="@+id/place_name"
+                    android:id="@+id/temp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/s10dp"
-                    android:layout_weight="1"
-                    android:padding="@dimen/s10dp"
-                    android:text="@{weatherViewModel.placeName}"
+                    android:text="@{weatherViewModel.temp}"
                     android:textColor="@color/black"
+                    android:textSize="@dimen/s12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/temp_text" />
+
+                <TextView
+                    android:id="@+id/pressure_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/s10dp"
+                    android:text="@string/pressure"
+                    android:textColor="@color/standard"
                     android:textSize="@dimen/s14sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/city_search" />
+                    app:layout_constraintTop_toBottomOf="@id/temp" />
 
-            </LinearLayout>
+                <TextView
+                    android:id="@+id/pressure"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/s10dp"
+                    android:text="@{weatherViewModel.pressure}"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/s12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/pressure_text" />
+
+                <TextView
+                    android:id="@+id/humidity_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/s10dp"
+                    android:text="@string/humidity"
+                    android:textColor="@color/standard"
+                    android:textSize="@dimen/s14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/pressure" />
+
+                <TextView
+                    android:id="@+id/humidity"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/s10dp"
+                    android:text="@{weatherViewModel.humidity}"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/s12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/humidity_text" />
+
+                <ImageView
+                    android:id="@+id/weather_icon"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="@dimen/s10dp"
+                    android:paddingBottom="@dimen/s10dp"
+                    android:src="@mipmap/ic_launcher"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/humidity" />
+
+                <TextView
+                    android:id="@+id/clouds_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/s10dp"
+                    android:fontFamily="@font/alata"
+                    android:padding="@dimen/s10dp"
+                    android:text='@{weatherViewModel.clouds}'
+                    android:textAllCaps="true"
+                    android:textColor="@color/standard"
+                    android:textSize="@dimen/s14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/weather_icon" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </androidx.cardview.widget.CardView>
-
-        <TextView
-            android:id="@+id/temp_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/s10dp"
-            android:text="@string/temp"
-            android:textColor="@color/standard"
-            android:textSize="@dimen/s14sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/place_card" />
-
-        <TextView
-            android:id="@+id/temp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/s10dp"
-            android:text="@{weatherViewModel.temp}"
-            android:textColor="@color/black"
-            android:textSize="@dimen/s12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/temp_text" />
-
-        <TextView
-            android:id="@+id/pressure_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/s10dp"
-            android:text="@string/pressure"
-            android:textColor="@color/standard"
-            android:textSize="@dimen/s14sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/temp" />
-
-        <TextView
-            android:id="@+id/pressure"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/s10dp"
-            android:text="@{weatherViewModel.pressure}"
-            android:textColor="@color/black"
-            android:textSize="@dimen/s12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/pressure_text" />
-
-        <TextView
-            android:id="@+id/humidity_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/s10dp"
-            android:text="@string/humidity"
-            android:textColor="@color/standard"
-            android:textSize="@dimen/s14sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/pressure" />
-
-        <TextView
-            android:id="@+id/humidity"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/s10dp"
-            android:text="@{weatherViewModel.humidity}"
-            android:textColor="@color/black"
-            android:textSize="@dimen/s12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/humidity_text" />
-
-        <ImageView
-            android:id="@+id/weather_icon"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="@dimen/s10dp"
-            android:src="@mipmap/ic_launcher"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/humidity" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

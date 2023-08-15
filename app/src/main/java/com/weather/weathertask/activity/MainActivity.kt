@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.location.*
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -38,11 +39,14 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var locationByNetwork: Location
     private var latitude: Double = 0.0
     private var longitude: Double = 0.0
+    private var city: String = ""
+
 
     // private lateinit var mFusedLocationClient: FusedLocationProviderClient
     private var currentLocation: Location? = null
     lateinit var locationManager: LocationManager
     private lateinit var sharedPreference: SharedPreferences
+    private lateinit var editor: SharedPreferences.Editor
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,10 +55,10 @@ class MainActivity : AppCompatActivity(), LocationListener {
         val view = mainBinding.root
         setContentView(view)
         sharedPreference = getSharedPreferences("WEATHER_APP", Context.MODE_PRIVATE)
-        var editor: SharedPreferences.Editor = sharedPreference.edit()
+        editor = sharedPreference.edit()
 
 
-        var city = sharedPreference.getString("City", "")
+        city = sharedPreference.getString("City", "")!!
         mainBinding.citySearch.setText(city)
 
         if (ActivityCompat.checkSelfPermission(
@@ -71,7 +75,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.ACCESS_FINE_LOCATION
                 ), 1432
-            );
+            )
         } else {
             progressDialog =
                 ProgressDialog.show(this@MainActivity, null, resources.getString(R.string.loading))
@@ -80,6 +84,11 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
         }
 
+        // Viewmodel to update the data with UI
+        weatherViewmodel = ViewModelProvider(this)[WeatherViewmodel::class.java]
+        var list = weatherViewmodel.observeWeatherLiveData()
+        mainBinding.weatherViewModel = weatherViewmodel
+        mainBinding.lifecycleOwner = this@MainActivity
 
 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -168,35 +177,10 @@ class MainActivity : AppCompatActivity(), LocationListener {
             }
         }
 
-        weatherViewmodel = ViewModelProvider(this)[WeatherViewmodel::class.java]
-        var list = weatherViewmodel.observeWeatherLiveData()
-        mainBinding.weatherViewModel = weatherViewmodel
-        mainBinding.lifecycleOwner = this@MainActivity
 
-        mainBinding.goWeatherBtn.setOnClickListener {
-            if (city.equals("")) {
-                city = mainBinding.citySearch.text.toString().trim()
-            }
+        /*  mainBinding.goWeatherBtn.setOnClickListener {
 
-            city = mainBinding.citySearch.text.toString().trim()
-            editor.putString("City", city)
-            editor.apply()
-            CoroutineScope(Dispatchers.IO).launch {
-                val response = ApiService.getApi()
-                    ?.getWeatherByCity(city!!, WEATHER_KEY)
-                /*?.getWeather(
-                    latitude.toString(),
-                    longitude.toString(),
-                    "16a65673c31ba783edb476c6f1b1dc9b"
-                )*/
-
-                Log.d("TAG", "onCreateWeather: " + response!!.body().toString())
-
-                if (response.isSuccessful) {
-                    updateData(response)
-                }
-            }
-        }
+      }*/
 
         val permission = ContextCompat.checkSelfPermission(
             this@MainActivity,
@@ -209,8 +193,88 @@ class MainActivity : AppCompatActivity(), LocationListener {
             Toast.makeText(this, "No permission given", Toast.LENGTH_LONG).show()
         }
 
-
     }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (requestCode == 1432) {
+                progressDialog =
+                    ProgressDialog.show(
+                        this@MainActivity,
+                        null,
+                        resources.getString(R.string.loading)
+                    )
+                locationmanager = getSystemService(LOCATION_SERVICE) as LocationManager
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return
+                }
+                locationmanager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER,
+                    0,
+                    100f,
+                    this
+                )
+
+            }
+        }
+    }
+
+    fun goButtonClick(view: View) {
+        if (mainBinding.citySearch.text.toString().equals("")){
+            mainBinding.citySearch.setError(resources.getString(R.string.valid_name))
+        }else{
+            if (city.equals("")) {
+                city = mainBinding.citySearch.text.toString().trim()
+            }
+
+            city = mainBinding.citySearch.text.toString().trim()
+            editor.putString("City", city)
+            editor.apply()
+            progressDialog =
+                ProgressDialog.show(this@MainActivity, null, resources.getString(R.string.loading))
+
+
+            //Coroutine to fetch the data
+            CoroutineScope(Dispatchers.IO).launch {
+                val response = ApiService.getApi()
+                    ?.getWeatherByCity(city!!, WEATHER_KEY)
+                /*?.getWeather(
+                    latitude.toString(),
+                    longitude.toString(),
+                    "16a65673c31ba783edb476c6f1b1dc9b"
+                )*/
+
+                Log.d("TAG", "onCreateWeather: " + response!!.body().toString())
+
+                if (response.isSuccessful) {
+                    progressDialog!!.dismiss()
+                    updateData(response)
+                }
+            }
+        }
+    }
+
 
     private fun getLocation() {
 
@@ -288,6 +352,7 @@ class MainActivity : AppCompatActivity(), LocationListener {
     }
 
     private fun getCurrentWeatherData(latitude: Double, longitude: Double) {
+        //Coroutine scope to fetch the data
         CoroutineScope(Dispatchers.IO).launch {
             val response = ApiService.getApi()
                 ?.getWeather(latitude, longitude, WEATHER_KEY)
@@ -311,19 +376,24 @@ class MainActivity : AppCompatActivity(), LocationListener {
 
     private fun updateData(response: Response<WeatherModel>) {
 
+        //Coroutine scope to update the data onto Main thread
         CoroutineScope(Dispatchers.Main).launch {
 
             weatherViewmodel.temp.value =
-                /*StringUtils.convertTemp*/(response.body()!!.temp!!.temp.toString())
+                    /*StringUtils.convertTemp*/(response.body()!!.temp!!.temp.toString())
             // mainBinding.temp.text = response.body()!!.temp!!.temp.toString()
             weatherViewmodel.pressure.value = response.body()!!.temp!!.pressure.toString()
             weatherViewmodel.humidity.value = response.body()!!.temp!!.humidity.toString()
             weatherViewmodel.placeName.value = response.body()!!.name.toString()
 
+            weatherViewmodel.longTask()
+
             var iconsList = response.body()!!.weatherInfo
             var iconUrl =
-                "https://openweathermap.org/img/wn/" + iconsList!!.get(0).icon + "@" + "2x" + ".png"
+                "https://openweathermap.org/img/wn/" + iconsList!![0].icon + "@" + "2x" + ".png"
             Picasso.get().load(iconUrl).fit().into(mainBinding.weatherIcon)
+            weatherViewmodel.clouds.value = iconsList[0].description
+
         }
     }
 

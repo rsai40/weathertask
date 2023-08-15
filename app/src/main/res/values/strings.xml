@@ -7,4 +7,5 @@
     <string name="pressure">Pressure</string>
     <string name="humidity">Humidity</string>
     <string name="loading">Loading</string>
+    <string name="valid_name">Field cannot be empty</string>
 </resources>
